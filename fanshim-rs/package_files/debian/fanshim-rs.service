@@ -1,0 +1,12 @@
+[Unit]
+Description=Driver for Pimoroni Fan SHIM.
+Documentation=man:fanshim-rs
+
+[Service]
+ExecStart=/usr/bin/fanshim-rs
+Restart=always
+RestartSec=10
+Type=simple
+
+[Install]
+WantedBy=multi-user.target

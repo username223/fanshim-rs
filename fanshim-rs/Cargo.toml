@@ -1,0 +1,30 @@
+[package]
+name = "fanshim-rs"
+version = "0.1.0"
+authors = ["Vasily <vautkin@teknik.io>"]
+edition = "2018"
+license = "MIT OR Apache-2.0"
+description = "Rust driver for Pimoroni Fan SHIM."
+readme = "../README.md"
+
+[dependencies]
+fanshim-lib = { path = "../fanshim-lib" }
+log = "0.4.11"
+simplelog = "0.8.0"
+simple-signal = "1.1.1"
+
+# For building .deb files using `cargo deb`.
+[package.metadata.deb]
+extended-description = """\
+A fast, usable and safe userland driver for the Pimoroni Fan SHIM Fan and LED. \
+Features systemd integration, logging and a .toml config file."""
+section = "misc"
+maintainer-scripts = "package_files/debian/"
+conf-files = ["/etc/fanshim-rs.toml"]
+assets = [
+    ["target/release/fanshim-rs", "usr/bin/", "755"],
+    ["package_files/fanshim-rs.toml", "/etc/", "644"],
+    ["package_files/fanshim-rs.1", "/usr/share/man/man1/", "644"],
+]
+
+[package.metadata.deb.systemd-units]

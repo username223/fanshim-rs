@@ -1,0 +1,25 @@
+# Maintainer: Vasily Utkin <vautkin AT teknik DOT io>
+pkgname=fanshim-rs
+pkgver=PACKAGE_VERSION
+pkgrel=1
+epoch=0
+pkgdesc="Userland driver for the Pimoroni Fan SHIM written in rust."
+arch=("armv7h")
+url="https://github.com/username223/fanshim-rs"
+license=("MIT")
+depends=("rust")
+source=("https://github.com/username223/fanshim-rs/archive/v$pkgver.tar.gz")
+
+build() {
+    cd "fanshim-rs-$pkgver"
+
+    cargo build --release
+}
+
+package() {
+    cd "fanshim-rs-$pkgver"
+
+
+    # Install
+    make install
+}

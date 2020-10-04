@@ -1,0 +1,10 @@
+[workspace]
+
+members = [
+    "fanshim-rs",
+    "fanshim-lib",
+]
+
+[profile.release]
+lto = true
+codegen-units = 1

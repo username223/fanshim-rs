@@ -1,0 +1,28 @@
+[general]
+    # Milliseconds between temperature checks.
+    # 1000 would be one second.
+    milliseconds_delay_between_readings = 2500
+
+    # Amount of temperature checks before the fan enables/disables.
+    number_of_readings_before_action = 3
+
+[fan]
+    # Temperature in celsius to enable the fan.
+    enable_fan_at_degrees_celsius = 55
+
+    # Temperature in celsius to disable the fan.
+    disable_fan_at_degrees_celsius = 45
+
+[led]
+    # Value from 0.0 to 1.0. Set to 0.0 to disable LED.
+    # Notice that 1.0 is _very_ bright. At or below 0.1 should suffice.
+    led_brightness = 0.1
+
+    [led.fan_status]
+        # Color of the LED when the fan is on. 
+        # RGB format, where [ 255, 0, 0] is maximum red.
+        led_on_color = [ 255, 0, 0 ]
+
+        # Color of the LED when the fan is off.
+        # RGB format, where [ 0, 255, 0] is maximum green.
+        led_off_color = [ 0, 255, 0 ]

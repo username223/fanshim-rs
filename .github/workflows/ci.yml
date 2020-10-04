@@ -1,0 +1,142 @@
+on: [push, pull_request]
+
+name: CI
+
+jobs:
+  quickcheck:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.rustversion.outputs.rustversion }}
+    steps:
+    - uses: actions/checkout@v2
+    - run: cargo check
+    - run: cargo pkgid -p fanshim-rs
+    - run: 'echo "$(cargo pkgid -p fanshim-rs | cut -d# -f2)"'
+    - id: rustversion
+      run: 'echo "::set-output name=rustversion::$(cargo pkgid -p fanshim-rs | cut -d# -f2)"'
+  update_release_draft:
+    needs: [quickcheck, armv7build]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v2
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: 'v${{ needs.quickcheck.outputs.version }}'
+          release_name: ${{ needs.quickcheck.outputs.version }}
+          body: 'Change Me'
+          draft: true
+          prerelease: false
+      - uses: actions/download-artifact@v2
+      - run: ls -lha
+      - name: Upload armv7 deb Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./armv7deb/fanshim-rs_${{needs.quickcheck.outputs.version}}_armhf.deb
+          asset_name: 'fanshim-rs_${{needs.quickcheck.outputs.version}}_armhf.deb'
+          asset_content_type: application/vnd.debian.binary-package
+      - name: Upload armv7 binary Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./armv7bin/fanshim-rs
+          asset_name: 'fanshim-rs'
+          asset_content_type: application/x-elf
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: check
+
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+
+  fmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - run: rustup component add rustfmt
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - run: rustup component add clippy
+      - uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: -- -D warnings
+  armv7build:
+    runs-on: ubuntu-latest
+    container: ebbflow/cargo-deb-armv7-debian
+    name: armv7hf deb file
+    steps:
+    - uses: actions/checkout@v2
+    - name: Deb build
+      uses: ebbflow-io/cargo-deb-armv7-debian@1.0
+      with:
+          cmd: |
+              # armv7 strip is not included in image by default
+              # https://github.com/ebbflow-io/cargo-deb-armv7-debian/issues/2
+              apt-get install binutils-arm-linux-gnueabihf
+              echo 'strip = { path = "arm-linux-gnueabihf-strip" }' >> /root/.cargo/config
+              # cargo-deb in image does not have systemd support
+              # https://github.com/ebbflow-io/cargo-deb-armv7-debian/issues/1
+              cargo uninstall cargo-deb
+              cargo install cargo-deb
+              cargo deb --version
+              cargo deb --target=armv7-unknown-linux-musleabihf -p fanshim-rs
+    - name: Upload Deb Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: armv7deb
+        path: ./target/armv7-unknown-linux-musleabihf/debian/*
+    - name: Upload Binary Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: armv7bin
+        path: ./target/armv7-unknown-linux-musleabihf/release/fanshim-rs

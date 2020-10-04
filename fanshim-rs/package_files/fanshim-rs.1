@@ -1,0 +1,82 @@
+.TH FANSHIM-RS 1 2020-09-26
+.SH NAME
+fanshim-rs \- Controls the Pimoroni Fan SHIM.
+.SH SYNOPSIS
+.B fanshim-rs
+[\fB\-\-help|\-h\fR]
+[\fB\-\-version|\-v\fR]
+.SH DESCRIPTION
+.B fanshim-rs
+is a fast, usable and safe userland driver for the Pimoroni Fan SHIM Fan and LED.
+.PP
+The program is designed to be easily configurable through the config file located at \fI/etc/fanshim-rs.toml\fR.
+If a config file is not found the defaults will be used.
+.PP
+This driver should ideally be controlled through your init system.
+.PP
+When \fBSIGINT\fR or \fBSIGTERM\fR are received, the program will turn off the fan and LED, and exit.
+When uninstalled the program will do the same.
+.SH OPTIONS
+.TP
+.BR \-h ", " \-\-help
+Prints help text.
+.TP
+.BR \-v ", " \-\-version
+Prints program version. Format is \fB "x.x.x"\fR.
+.SH EXIT STATUS
+Program exits with \fB0\fR on succesful runs (print help or version, when receiving \fBSIGTERM\fR or \fBSIGINT\fR), or with \fB1\fR if an unknown command is passed.
+Otherwise the program will run until killed.
+.SH EXAMPLES
+This program is controlled through 
+.BR systemd
+with the
+.BR systemctl
+command.
+Remember that you might need to use \fBsudo\fR.
+.PP
+To start the driver:
+.PP
+.nf
+.RS
+systemctl start fanshim-rs.service
+.RE
+.fi
+.PP
+To stop the driver:
+.PP
+.nf
+.RS
+systemctl stop fanshim-rs.service
+.RE
+.fi
+.PP
+To have the driver run on every boot:
+.PP
+.nf
+.RS
+systemctl enable fanshim-rs.service
+.RE
+.fi
+.PP
+To show the status of the driver:
+.PP
+.nf
+.RS
+systemctl status fanshim-rs.service
+.RE
+.fi
+.PP
+To show log files for the driver:
+.PP
+.nf
+.RS
+journalctl -u fanshim-rs
+.RE
+.fi
+.PP
+.SH AUTHOR
+Vasily <vautkin@teknik.io>
+.SH SEE ALSO
+The official \fBPimoroni\fR driver at \fIhttps://github.com/pimoroni/fanshim-python\fR.
+.PP
+If \fBsystemd\fR is used, \fBsystemctl(1)\fR is used to control the program.
