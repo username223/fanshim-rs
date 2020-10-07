@@ -13,6 +13,7 @@ A fast, usable and safe userland driver for the Pimoroni Fan SHIM Fan and LED.
 
 * No button support.
 * No advanced LED support.
+* No dedicated library support.
 
 ## Usage
 
@@ -96,12 +97,17 @@ cargo install cross
 cargo build --target armv7-unknown-linux-gnueabihf
 ```
 
+## Library
+
+The `fanshim-lib` library is not intended for public use, since it's mostly just passing variables directly to `rppal` and `blinkt`.
+
 ## See Also
 
 * [The official software library (Python)](https://github.com/pimoroni/fanshim-python)
 * [A C version (flobernd)](https://github.com/flobernd/raspi-fanshim)
 * [A C++ Version (daviehh)](https://github.com/daviehh/fanshim-cpp)
 * [Issue that spawned the non-Python versions](https://github.com/pimoroni/fanshim-python/issues/19)
+
 
 ## License
 
