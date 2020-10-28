@@ -117,17 +117,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Deb build
-      uses: ebbflow-io/cargo-deb-armv7-debian@1.0
+      uses: ebbflow-io/cargo-deb-armv7-debian@1.47.0-1
       with:
           cmd: |
-              # armv7 strip is not included in image by default
-              # https://github.com/ebbflow-io/cargo-deb-armv7-debian/issues/2
-              apt-get install binutils-arm-linux-gnueabihf
-              echo 'strip = { path = "arm-linux-gnueabihf-strip" }' >> /root/.cargo/config
-              # cargo-deb in image does not have systemd support
-              # https://github.com/ebbflow-io/cargo-deb-armv7-debian/issues/1
-              cargo uninstall cargo-deb
-              cargo install cargo-deb
               cargo deb --version
               cargo deb --target=armv7-unknown-linux-musleabihf -p fanshim-rs
     - name: Upload Deb Artifact
