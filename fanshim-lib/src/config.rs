@@ -86,22 +86,12 @@ impl Default for LedTemperatureStatus {
     }
 }
 
-#[derive(serde::Deserialize, Debug)]
+#[derive(serde::Deserialize, Debug, Default)]
 #[serde(default)]
 pub struct FanshimInterimConfig {
     pub fan: Fan,
     pub general: General,
     pub led: Led,
-}
-
-impl Default for FanshimInterimConfig {
-    fn default() -> Self {
-        Self {
-            fan: Default::default(),
-            general: Default::default(),
-            led: Default::default(),
-        }
-    }
 }
 
 #[derive(Debug)]
